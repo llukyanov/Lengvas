@@ -66,6 +66,69 @@ ALTER SEQUENCE auto_listings_id_seq OWNED BY auto_listings.id;
 
 
 --
+-- Name: auto_makers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE auto_makers (
+    id integer NOT NULL,
+    name character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: auto_makers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE auto_makers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: auto_makers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE auto_makers_id_seq OWNED BY auto_makers.id;
+
+
+--
+-- Name: auto_models; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE auto_models (
+    id integer NOT NULL,
+    auto_maker_id integer,
+    name character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: auto_models_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE auto_models_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: auto_models_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE auto_models_id_seq OWNED BY auto_models.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -82,11 +145,41 @@ ALTER TABLE ONLY auto_listings ALTER COLUMN id SET DEFAULT nextval('auto_listing
 
 
 --
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY auto_makers ALTER COLUMN id SET DEFAULT nextval('auto_makers_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY auto_models ALTER COLUMN id SET DEFAULT nextval('auto_models_id_seq'::regclass);
+
+
+--
 -- Name: auto_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY auto_listings
     ADD CONSTRAINT auto_listings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auto_makers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY auto_makers
+    ADD CONSTRAINT auto_makers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auto_models_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY auto_models
+    ADD CONSTRAINT auto_models_pkey PRIMARY KEY (id);
 
 
 --
@@ -139,6 +232,27 @@ CREATE INDEX index_auto_listings_on_type ON auto_listings USING btree (type);
 
 
 --
+-- Name: index_auto_makers_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_auto_makers_on_name ON auto_makers USING btree (name);
+
+
+--
+-- Name: index_auto_models_on_auto_maker_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_auto_models_on_auto_maker_id ON auto_models USING btree (auto_maker_id);
+
+
+--
+-- Name: index_auto_models_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_auto_models_on_name ON auto_models USING btree (name);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -154,4 +268,8 @@ SET search_path TO "$user", public, postgis;
 INSERT INTO schema_migrations (version) VALUES ('0');
 
 INSERT INTO schema_migrations (version) VALUES ('20160731191958');
+
+INSERT INTO schema_migrations (version) VALUES ('20160814161129');
+
+INSERT INTO schema_migrations (version) VALUES ('20160814161832');
 

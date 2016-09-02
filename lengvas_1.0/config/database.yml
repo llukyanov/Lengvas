@@ -1,9 +1,0 @@
-development: 
-  adapter: postgis
-  postgis_extension: postgis
-  schema_search_path: '"$user", public, postgis'
-  database: lengvas
-  encoding: utf8
-  pool: 5
-  username: Leonid_Lukyanov
-  password:
