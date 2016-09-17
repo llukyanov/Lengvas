@@ -24,15 +24,15 @@ CREATE TABLE auto_listings (
     source character varying,
     url character varying,
     image_url character varying,
-    date character varying,
+    listing_time character varying,
     listing_id character varying,
     make character varying,
     model character varying,
     vin character varying,
-    type character varying,
-    year integer,
+    bodytype character varying,
+    manufacture_date integer,
     fuel_type character varying,
-    transmision character varying,
+    transmission character varying,
     engine_liters character varying,
     power integer,
     mileage integer,
@@ -183,6 +183,13 @@ ALTER TABLE ONLY auto_models
 
 
 --
+-- Name: index_auto_listings_on_bodytype; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_auto_listings_on_bodytype ON auto_listings USING btree (bodytype);
+
+
+--
 -- Name: index_auto_listings_on_listing_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -222,13 +229,6 @@ CREATE INDEX index_auto_listings_on_price ON auto_listings USING btree (price);
 --
 
 CREATE INDEX index_auto_listings_on_source ON auto_listings USING btree (source);
-
-
---
--- Name: index_auto_listings_on_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_auto_listings_on_type ON auto_listings USING btree (type);
 
 
 --
@@ -272,4 +272,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160731191958');
 INSERT INTO schema_migrations (version) VALUES ('20160814161129');
 
 INSERT INTO schema_migrations (version) VALUES ('20160814161832');
+
+INSERT INTO schema_migrations (version) VALUES ('20160915233717');
 
