@@ -130,7 +130,7 @@ describe AutoListing do
 
 		expect(listing_url).to_not eq(nil)
 		expect(listing_id).to_not eq(nil)
-		expect(listing_image_url).to_not eq(nil)
+		expect{ listing_image_url }.not_to raise_error
 		expect{ listing_posting_time }.not_to raise_error
 		expect(listing_location).to_not eq(nil)
 		expect(listing_make).to_not eq(nil)
