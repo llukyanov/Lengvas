@@ -30,7 +30,6 @@ CREATE TABLE auto_listings (
     model character varying,
     vin character varying,
     bodytype character varying,
-    manufacture_date integer,
     fuel_type character varying,
     transmission character varying,
     engine_liters character varying,
@@ -42,7 +41,8 @@ CREATE TABLE auto_listings (
     city character varying,
     country character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    status_updated_at timestamp without time zone
 );
 
 
@@ -323,4 +323,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160814161832');
 INSERT INTO schema_migrations (version) VALUES ('20160915233717');
 
 INSERT INTO schema_migrations (version) VALUES ('20160917173801');
+
+INSERT INTO schema_migrations (version) VALUES ('20161003193619');
 
