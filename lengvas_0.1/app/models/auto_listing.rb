@@ -23,7 +23,7 @@ class AutoListing < ActiveRecord::Base
 	def AutoListing.scrape_alio(page_num=1)
 		mechanize = Mechanize.new
 		
-		source = "alio"		
+		source = "alio"
 		page = mechanize.get("http://www.alio.lt/paieska.html?category_id=613&order=A.ad_id%7CDESC&page=#{page_num}")
 		listings = page.search(".main_a_c_b")
 		
@@ -37,7 +37,7 @@ class AutoListing < ActiveRecord::Base
 
 		listings.each do |listing|
 			i += 1
-			dupe_attempt_count += AutoListing.create_new_auto_listing(listing, source) ? 0:1
+			dupe_attempt_count += AutoListing.create_new_auto_listing(listing, source, page_num) ? 0:1
 
 			if dupe_attempt_count > 5
 				break
@@ -49,14 +49,14 @@ class AutoListing < ActiveRecord::Base
 		end
 	end
 
-	def AutoListing.create_new_auto_listing(listing, source)
+	def AutoListing.create_new_auto_listing(listing, source, page_num)
 		listing_id = AutoListing.extract_listing_id(listing, source)
 
 		if listing_id > 0 and not AutoListing.where("source = ? AND listing_id = ?", source, listing_id.to_s).any? 
 			listing_url = AutoListing.extract_listing_url(listing, source)			
 			listing_image_url = AutoListing.extract_image_url(listing, source)
 			listing_posting_time = AutoListing.extract_posting_time(listing, source)
-			listing_location = AutoListing.extract_location(listing, source)				
+			listing_location = AutoListing.extract_location(listing, source)
 			listing_auto_details = AutoListing.extract_make_model_body_type(listing, source)
 			listing_make = listing_auto_details["Make"]
 			listing_model = listing_auto_details["Model"]
@@ -65,15 +65,15 @@ class AutoListing < ActiveRecord::Base
 			listing_fuel = AutoListing.extract_fuel_type(listing, source)
 			listing_transmission = AutoListing.extract_transmission(listing, source)
 			listing_engine_literage = AutoListing.extract_engine_literage(listing, source)
-			listing_power = AutoListing.extract_power(listing, source)				
-			listing_mileage = AutoListing.extract_mileage(listing, source)		
+			listing_power = AutoListing.extract_power(listing, source)
+			listing_mileage = AutoListing.extract_mileage(listing, source)
 			listing_price = AutoListing.extract_price(listing, source)
 
 			AutoListing.create!(:source => source, :listing_id => listing_id, :url => listing_url, :image_url => listing_image_url,
 				:listing_time => listing_posting_time, :make => listing_make, :model => listing_model, :bodytype => listing_bodytype, 
 				:manufacture_date => listing_manufacture_date, :fuel_type => listing_fuel, :transmission => listing_transmission, 
 				:engine_liters => listing_engine_literage, :power => listing_power, :mileage => listing_mileage, :price =>listing_price,
-				:city => listing_location)
+				:city => listing_location, :listing_page => page_num)
 		else
 			nil
 		end
@@ -148,7 +148,7 @@ class AutoListing < ActiveRecord::Base
 		elsif source == "autogidas"
 			listing_image_url = listing.search('*[@class="image"]').at('img').attributes["src"].value rescue nil
 		elsif source == "alio"
-			listing_image_url = listing.search('*[@class="image"]').at('img')["src"] rescue nil
+			listing_image_url = listing.search('*[@class="image"]').at("img").attributes["data-src"].value rescue nil
 		else
 			listing_image_url = nil
 		end
@@ -273,13 +273,13 @@ class AutoListing < ActiveRecord::Base
 			listing_description_arr = listing_description.split(", ")
 			listing_make = AutoListing.make_lookup(listing_description_arr.first.split.first)
 			listing_model = listing_description_arr.first.gsub(listing_make.name, "").strip
-			listing_body_type = autoplius_body_types[listing_description_arr.last]
+			listing_body_type = autoplius_body_types[listing_description_arr.last.strip]
 		elsif source == "autogidas"
 			listing_description_arr = listing_description.split
 
-			listing_make = AutoListing.make_lookup(listing_description_arr.first.split.first)
+			listing_make = AutoListing.make_lookup(listing_description_arr.first.split.first.strip)
 
-			listing_body_type = autogidas_body_types[listing_description_arr.last]
+			listing_body_type = autogidas_body_types[listing_description_arr.last.strip]
 
 			raw_model_text = listing_description.gsub(listing_make.name, "").gsub(listing_body_type, "")
 			raw_model_leading_text = raw_model_text.split.first.strip rescue listing_body_type
@@ -287,9 +287,9 @@ class AutoListing < ActiveRecord::Base
 			listing_model = listing_model_lookup.name
 		elsif source == "alio"
 			listing_description_arr = listing_description.split(", ")
-			listing_make = AutoListing.make_lookup(listing_description_arr.first.split.first)
+			listing_make = AutoListing.make_lookup(listing_description_arr.first.split.first.strip)
 			listing_model = listing_description_arr.first.gsub(listing_make.name, "").strip
-			listing_body_type = alio_body_types[listing_description_arr.last]
+			listing_body_type = alio_body_types[listing_description_arr.last.strip]
 		else
 			nil
 		end
@@ -402,7 +402,7 @@ class AutoListing < ActiveRecord::Base
 			listing_details_arr = listing.search('*[@class="description"]').text.split(" | ")
 			if listing_details_arr.length == 7
 				#all details present so mileage is entry 6
-				listing_mileage_text = listing_details_arr[3]
+				listing_mileage_text = listing_details_arr[5]
 				listing_mileage = self.sanitize_listing_mileage_text(listing_mileage_text)
 			else
 				#details missing, thus must itterarte through and check if a mileage entry is present.
@@ -468,20 +468,21 @@ class AutoListing < ActiveRecord::Base
 		if source == "autoplius"
 			listing_fuel_type = listing.search('*[@title="Fuel type"]').text
 		elsif source == "autogidas"
+			fuel_type_normalizer = {"Gasoline" => "Gasoline", "Diesel" => "Diesel", "Petrol / Gas" => "Gasoline - Gas", "Gasoline/Electric" => "Hybrid"}
 			listing_description = listing.search('*[@class="item-description"]').at('[class="secondary"]').text
 			listing_description_arr = listing_description.split(", ")
-			listing_fuel_type = listing_description_arr[0]
+			listing_fuel_type = fuel_type_normalizer[listing_description_arr[0]]
 		elsif source == "alio"
 			listing_fuel_type = nil
-			lt_translator = {"Benzinas" => "Gasoline", "Dyzelinas" => "Diesel",  "Benzinas - Dujos" => "Gasoline"}
+			lt_translator = {"Benzinas" => "Gasoline", "Dyzelinas" => "Diesel", "Benzinas - Dujos" => "Gasoline - Gas"}
 			listing_details_arr = listing.search('*[@class="description"]').text.split(" | ")
 			if listing_details_arr.length == 7
-				listing_fuel_lt = listing_details_arr[1]
+				listing_fuel_lt = listing_details_arr[1].strip
 				listing_fuel_type = lt_translator[listing_fuel_lt]
 			else
 				for entry in listing_details_arr
-					if lt_translator.keys.include? entry
-						listing_fuel_type = lt_translator[entry]		
+					if lt_translator.keys.include? entry.strip
+						listing_fuel_type = lt_translator[entry.strip]		
 						break
 					end
 				end
@@ -497,20 +498,21 @@ class AutoListing < ActiveRecord::Base
 		if source == "autoplius"
 			listing_transmission = listing.search('*[@title="Gearbox"]').text
 		elsif source == "autogidas"
+			normalizer = {"Automatic" => "Automatic", "Mechanical" => "Manual"}
 			listing_description = listing.search('*[@class="item-description"]').at('[class="primary"]').text
 			listing_descpition_arr = listing_description.split(", ")
-			listing_transmission = listing_descpition_arr[1]
+			listing_transmission = normalizer[listing_descpition_arr[1]]
 		elsif source == "alio"
 			listing_transmission = nil
 			lt_translator = {"Automatinė" => "Automatic", "Mechaninė" => "Mechanical"}
 			listing_details_arr = listing.search('*[@class="description"]').text.split(" | ")
 			if listing_details_arr.length == 7
-				listing_fuel_lt = listing_details_arr[4]
-				listing_fuel_type = lt_translator[listing_fuel_lt]
+				listing_transmission_lt = listing_details_arr[4].strip
+				listing_transmission = lt_translator[listing_transmission_lt]
 			else
 				for entry in listing_details_arr
-					if lt_translator.keys.include? entry
-						listing_transmission = lt_translator[entry]		
+					if lt_translator.keys.include? entry.strip
+						listing_transmission = lt_translator[entry.strip]		
 						break
 					end
 				end

@@ -42,7 +42,8 @@ CREATE TABLE auto_listings (
     country character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    status_updated_at timestamp without time zone
+    manufacture_date timestamp without time zone,
+    listing_page integer
 );
 
 
@@ -325,4 +326,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160915233717');
 INSERT INTO schema_migrations (version) VALUES ('20160917173801');
 
 INSERT INTO schema_migrations (version) VALUES ('20161003193619');
+
+INSERT INTO schema_migrations (version) VALUES ('20161003194828');
 
