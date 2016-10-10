@@ -279,7 +279,7 @@ class AutoListing < ActiveRecord::Base
 
 			listing_make = AutoListing.make_lookup(listing_description_arr.first.split.first.strip)
 
-			listing_body_type = autogidas_body_types[listing_description_arr.last.strip]
+			listing_body_type = autogidas_body_types[listing_description_arr.last.strip] || ""
 
 			raw_model_text = listing_description.gsub(listing_make.name, "").gsub(listing_body_type, "")
 			raw_model_leading_text = raw_model_text.split.first.strip rescue listing_body_type
@@ -287,9 +287,13 @@ class AutoListing < ActiveRecord::Base
 			listing_model = listing_model_lookup.name
 		elsif source == "alio"
 			listing_description_arr = listing_description.split(", ")
-			listing_make = AutoListing.make_lookup(listing_description_arr.first.split.first.strip)
-			listing_model = listing_description_arr.first.gsub(listing_make.name, "").strip
-			listing_body_type = alio_body_types[listing_description_arr.last.strip]
+			if listing_description_arr.count > 1
+				listing_make = AutoListing.make_lookup(listing_description_arr.first.split.first.strip)
+				listing_model = listing_description_arr.first.gsub(listing_make.name, "").strip
+				listing_body_type = alio_body_types[listing_description_arr.last.strip]
+			else
+				nil
+			end
 		else
 			nil
 		end
