@@ -53,28 +53,32 @@ class AutoListing < ActiveRecord::Base
 	def AutoListing.create_new_auto_listing(listing, source, page_num)
 		listing_id = AutoListing.extract_listing_id(listing, source)
 
-		if listing_id > 0 and not AutoListing.where("source = ? AND listing_id = ?", source, listing_id.to_s).any? 
-			listing_url = AutoListing.extract_listing_url(listing, source)			
-			listing_image_url = AutoListing.extract_image_url(listing, source)
-			listing_posting_time = AutoListing.extract_posting_time(listing, source)
-			listing_location = AutoListing.extract_location(listing, source)
+		if listing_id > 0 and not AutoListing.where("source = ? AND listing_id = ?", source, listing_id.to_s).any?
 			listing_auto_details = AutoListing.extract_make_model_body_type(listing, source)
-			listing_make = listing_auto_details["Make"]
-			listing_model = listing_auto_details["Model"]
-			listing_bodytype = listing_auto_details["Bodytype"]
-			listing_manufacture_date = AutoListing.extract_manufacture_date(listing, source)
-			listing_fuel = AutoListing.extract_fuel_type(listing, source)
-			listing_transmission = AutoListing.extract_transmission(listing, source)
-			listing_engine_literage = AutoListing.extract_engine_literage(listing, source)
-			listing_power = AutoListing.extract_power(listing, source)
-			listing_mileage = AutoListing.extract_mileage(listing, source)
-			listing_price = AutoListing.extract_price(listing, source)
+			if listing_auto_details != nil
+				listing_url = AutoListing.extract_listing_url(listing, source)			
+				listing_image_url = AutoListing.extract_image_url(listing, source)
+				listing_posting_time = AutoListing.extract_posting_time(listing, source)
+				listing_location = AutoListing.extract_location(listing, source)			
+				listing_make = listing_auto_details["Make"]
+				listing_model = listing_auto_details["Model"]
+				listing_bodytype = listing_auto_details["Bodytype"]
+				listing_manufacture_date = AutoListing.extract_manufacture_date(listing, source)
+				listing_fuel = AutoListing.extract_fuel_type(listing, source)
+				listing_transmission = AutoListing.extract_transmission(listing, source)
+				listing_engine_literage = AutoListing.extract_engine_literage(listing, source)
+				listing_power = AutoListing.extract_power(listing, source)
+				listing_mileage = AutoListing.extract_mileage(listing, source)
+				listing_price = AutoListing.extract_price(listing, source)
 
-			AutoListing.create!(:source => source, :listing_id => listing_id, :url => listing_url, :image_url => listing_image_url,
-				:listing_time => listing_posting_time, :make => listing_make, :model => listing_model, :bodytype => listing_bodytype, 
-				:manufacture_date => listing_manufacture_date, :fuel_type => listing_fuel, :transmission => listing_transmission, 
-				:engine_liters => listing_engine_literage, :power => listing_power, :mileage => listing_mileage, :price =>listing_price,
-				:city => listing_location, :listing_page => page_num)
+				AutoListing.create!(:source => source, :listing_id => listing_id, :url => listing_url, :image_url => listing_image_url,
+					:listing_time => listing_posting_time, :make => listing_make, :model => listing_model, :bodytype => listing_bodytype, 
+					:manufacture_date => listing_manufacture_date, :fuel_type => listing_fuel, :transmission => listing_transmission, 
+					:engine_liters => listing_engine_literage, :power => listing_power, :mileage => listing_mileage, :price =>listing_price,
+					:city => listing_location, :listing_page => page_num)
+			else
+				nil
+			end
 		else
 			nil
 		end
