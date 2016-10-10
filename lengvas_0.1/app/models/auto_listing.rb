@@ -77,7 +77,7 @@ class AutoListing < ActiveRecord::Base
 					:engine_liters => listing_engine_literage, :power => listing_power, :mileage => listing_mileage, :price =>listing_price,
 					:city => listing_location, :listing_page => page_num)
 			else
-				nil
+				"Non-title listing skipped"
 			end
 		else
 			nil
