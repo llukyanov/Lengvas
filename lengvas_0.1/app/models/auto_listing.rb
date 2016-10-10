@@ -14,7 +14,7 @@ class AutoListing < ActiveRecord::Base
 		mechanize = Mechanize.new
 		
 		source = "autogidas"		
-		page = mechanize.get("http://en.autogidas.lt/automobiliai/#{page_num}-psl/?f_50=ivedimo_laika_asc")		
+		page = mechanize.get("http://en.autogidas.lt/automobiliai/#{page_num}-psl/?f_50=atnaujinimo_laika_asc")		
 		listings = page.search('.item-link')
 
 		AutoListing.spider(listings, source, page_num)
@@ -332,7 +332,12 @@ class AutoListing < ActiveRecord::Base
 			else
 				month = 1
 			end
-			manufacture_date = DateTime.new(year, month)
+
+			if year.is_a? Integer && month.is_a? Integer
+				manufacture_date = DateTime.new(year, month)
+			else
+				nil
+			end
 		elsif source == "autogidas"
 			raw_listing_year = listing.search('*[@class="item-description"]').at('[class="primary"]').text.split(", ").first
 			raw_listing_year_arr = raw_listing_year.split("-")
@@ -342,7 +347,12 @@ class AutoListing < ActiveRecord::Base
 			else
 				month = 1
 			end
-			manufacture_date = DateTime.new(year, month)
+
+			if year.is_a? Integer && month.is_a? Integer
+				manufacture_date = DateTime.new(year, month)
+			else
+				nil
+			end
 		elsif source == "alio"
 			raw_listing_year = listing.search('*[@class="description"]').text.split(" | ").first
 			raw_listing_year_arr = raw_listing_year.split("-")
@@ -353,7 +363,12 @@ class AutoListing < ActiveRecord::Base
 				else
 					month = 1
 				end
-				manufacture_date = DateTime.new(raw_listing_year_arr.first.to_i, month)
+
+				if year.is_a? Integer && month.is_a? Integer
+					manufacture_date = DateTime.new(raw_listing_year_arr.first.to_i, month)
+				else
+					nil
+				end
 			else
 				manufacture_date = nil
 			end
