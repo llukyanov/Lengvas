@@ -333,7 +333,7 @@ class AutoListing < ActiveRecord::Base
 				month = 1
 			end
 
-			if year.is_a? Integer && month.is_a? Integer
+			if (year.is_a? Integer) && (month.is_a? Integer)
 				manufacture_date = DateTime.new(year, month)
 			else
 				nil
@@ -348,7 +348,7 @@ class AutoListing < ActiveRecord::Base
 				month = 1
 			end
 
-			if year.is_a? Integer && month.is_a? Integer
+			if (year.is_a? Integer) && (month.is_a? Integer)
 				manufacture_date = DateTime.new(year, month)
 			else
 				nil
@@ -364,7 +364,7 @@ class AutoListing < ActiveRecord::Base
 					month = 1
 				end
 
-				if year.is_a? Integer && month.is_a? Integer
+				if (year.is_a? Integer) && (month.is_a? Integer)
 					manufacture_date = DateTime.new(raw_listing_year_arr.first.to_i, month)
 				else
 					nil
