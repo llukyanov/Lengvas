@@ -47,6 +47,7 @@ class AutoListing < ActiveRecord::Base
 				self.send("scrape_#{source}", page_num+1)#recursive namespace method call.
 			end
 		end
+		p "Dupe attempts: #{dupe_attempt_count}"
 	end
 
 	def AutoListing.create_new_auto_listing(listing, source, page_num)
