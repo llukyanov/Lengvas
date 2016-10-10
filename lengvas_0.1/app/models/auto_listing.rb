@@ -39,7 +39,7 @@ class AutoListing < ActiveRecord::Base
 			i += 1
 			dupe_attempt_count += AutoListing.create_new_auto_listing(listing, source, page_num) ? 0:1
 
-			if dupe_attempt_count > 5
+			if dupe_attempt_count > 10
 				break
 			end
 
@@ -299,7 +299,11 @@ class AutoListing < ActiveRecord::Base
 			nil
 		end
 
-		return {"Make" => listing_make.name, "Model" => listing_model, "Bodytype" => listing_body_type}
+		if listing_make != nil
+			{"Make" => listing_make.name, "Model" => listing_model, "Bodytype" => listing_body_type}
+		else
+			nil
+		end
 	end
 
 	def AutoListing.make_lookup(q)
@@ -371,13 +375,11 @@ class AutoListing < ActiveRecord::Base
 					nil
 				end
 			else
-				manufacture_date = nil
+				nil
 			end
 		else
 			nil
 		end
-
-		return manufacture_date
 	end
 
 	def AutoListing.extract_price(listing, source)
