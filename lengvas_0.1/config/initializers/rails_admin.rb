@@ -8,6 +8,32 @@ RailsAdmin.config do |config|
   # end
   # config.current_user_method(&:current_user)
 
+  ## == Clearance ==
+  config.parent_controller = "::ApplicationController"
+
+  config.authorize_with do |controller|
+    unless current_user && current_user.admin?
+      redirect_to(
+        '/sign_in'#,
+        #alert:  "Hi #{current_user.name}!"
+      )
+    end
+  end
+
+  config.current_user_method(&:current_user)
+
+  config.model 'User' do
+    edit do
+      field :password do
+        help 'Required. Length of 8-128. <br />(leave blank if you don\'t want to change it)'.html_safe
+      end
+      field :password_confirmation do
+        hide
+      end
+      include_all_fields
+    end
+  end
+
   ## == Cancan ==
   # config.authorize_with :cancan
 

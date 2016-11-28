@@ -147,7 +147,11 @@ CREATE TABLE users (
     name character varying,
     email character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    encrypted_password character varying(128),
+    confirmation_token character varying(128),
+    remember_token character varying(128),
+    admin boolean DEFAULT false NOT NULL
 );
 
 
@@ -301,6 +305,20 @@ CREATE INDEX index_auto_models_on_name ON auto_models USING btree (name);
 
 
 --
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_email ON users USING btree (email);
+
+
+--
+-- Name: index_users_on_remember_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_remember_token ON users USING btree (remember_token);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -328,4 +346,10 @@ INSERT INTO schema_migrations (version) VALUES ('20160917173801');
 INSERT INTO schema_migrations (version) VALUES ('20161003193619');
 
 INSERT INTO schema_migrations (version) VALUES ('20161003194828');
+
+INSERT INTO schema_migrations (version) VALUES ('20161127231255');
+
+INSERT INTO schema_migrations (version) VALUES ('20161128002018');
+
+INSERT INTO schema_migrations (version) VALUES ('20161128011647');
 

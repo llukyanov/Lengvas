@@ -166,7 +166,7 @@ class AutoListing < ActiveRecord::Base
 			raw_posting_time = listing.search('*[@class="fr tools-right"]').text.split(".").first
 			if raw_posting_time != nil and raw_posting_time.length > 0
 				digits_units = AutoListing.digits_units_helper(raw_posting_time.downcase)
-				listing_posting_time = AutoListing.format_posting_time(digits_units.first, digits_units.last)
+				listing_posting_time = AutoListing.format_posting_time(digits_units.first, digits_units.last).to_datetime.utc
 			else
 				listing_posting_time = nil
 			end
@@ -179,8 +179,6 @@ class AutoListing < ActiveRecord::Base
 		else
 			nil
 		end
-
-		return listing_posting_time
 	end
 
 	#used to extract units and digits from string of type: "Before 5 h."

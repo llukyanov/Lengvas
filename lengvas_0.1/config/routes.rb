@@ -54,4 +54,6 @@ Rails.application.routes.draw do
   #     # (app/controllers/admin/products_controller.rb)
   #     resources :products
   #   end
+  get 'sign_in' => 'sessions#new', :as => nil
+  get 'sign_out' => 'sessions#destroy', :as => nil
 end
